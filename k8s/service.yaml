@@ -12,5 +12,4 @@ spec:
   ports:
     - port: 5000
       targetPort: 5000
-      protocal: TCP
 #     nodePort: 30080
