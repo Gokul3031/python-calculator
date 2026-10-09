@@ -1,0 +1,22 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-calculator
+  namespace: calci
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-calculator
+  template:
+    metadata:
+      labels:
+        app: python-calculator
+    spec:
+      containers:
+        - name: python-calculator
+          image: ghcr.io/gokul3031/python-calculator:latest
+          ports:
+            - containerPort: 5000
+          imagePullPolicy: Always
