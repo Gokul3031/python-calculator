@@ -6,6 +6,7 @@ metadata:
   namespace: calci
 spec:
   type: LoadBalancer
+  allocateLoadBalancerNodePorts: false
   selector:
     app: python-calculator
   ports:
