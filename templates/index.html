@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .calculator {
+            background: white;
+            padding: 28px;
+            border-radius: 14px;
+            box-shadow: 0 8px 25px #0001;
+            width: 300px;
+        }
+        h2 { text-align: center; color: #1e293b; }
+        input, select, button {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 12px;
+            margin-top: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+        }
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .result { color: #15803d; text-align: center; }
+        .error { color: #dc2626; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h2>Python Calculator</h2>
+        <form method="POST">
+            <input type="number" step="any" name="a"
+                   placeholder="First number" required>
+            <select name="operation">
+                <option value="add">Addition (+)</option>
+                <option value="subtract">Subtraction (-)</option>
+                <option value="multiply">Multiplication (×)</option>
+                <option value="divide">Division (÷)</option>
+            </select>
+            <input type="number" step="any" name="b"
+                   placeholder="Second number" required>
+            <button type="submit">Calculate</button>
+        </form>
+
+        {% if result is not none %}
+            <h3 class="result">Result: {{ result }}</h3>
+        {% endif %}
+        {% if error %}
+            <h3 class="error">{{ error }}</h3>
+        {% endif %}
+    </div>
+</body>
+</html>
