@@ -2,27 +2,28 @@ import time
 
 from flask import Flask, render_template, request
 from prometheus_flask_exporter import PrometheusMetrics
+from prometheus_client import Counter, Histogram
 
 app = Flask(__name__)
 metrics = PrometheusMetrics(app)
 
-calculator_operation_total = metrics.counter(
+calculator_operation_total = Counter(
     "calculator_operation_total",
     "Total number of calculator operations by type and result",
-    labelnames=["operation", "status"],
+    ["operation", "status"],
 )
 
-calculator_operation_duration_seconds = metrics.histogram(
+calculator_operation_duration_seconds = Histogram(
     "calculator_operation_duration_seconds",
     "Time spent processing calculator operations in seconds",
-    labelnames=["operation"],
+    ["operation"],
     buckets=(0.01, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0),
 )
 
-calculator_requests_total = metrics.counter(
+calculator_requests_total = Counter(
     "calculator_requests_total",
     "Total HTTP requests received by the calculator application",
-    labelnames=["method", "status"],
+    ["method", "status"],
 )
 
 @app.route("/", methods=["GET", "POST"])
