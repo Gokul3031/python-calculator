@@ -66,4 +66,6 @@ jobs:
           owner: Gokul3031
           token: ${{ secrets.GHCR_DELETE_TOKEN }}
           min-versions-to-keep: 2
+          num-old-versions-to-delete: 1
 
+       
