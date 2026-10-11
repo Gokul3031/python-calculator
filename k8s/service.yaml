@@ -10,6 +10,7 @@ spec:
   selector:
     app: python-calculator
   ports:
-    - port: 5000
+    - name: http
+      port: 5000
       targetPort: 5000
-#     nodePort: 30080
+      protocol: TCP
