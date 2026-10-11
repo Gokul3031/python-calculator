@@ -1,5 +1,4 @@
-from prometheus_flask_exporter import PrometheusMetrics
-from app import app
+from app import app, metrics
 
-# Export Flask application metrics at /metrics
-metrics = PrometheusMetrics(app)
+# Export Flask application metrics at /metrics via the app module.
+# This keeps compatibility with any deployment that imports monitor.py.
