@@ -1,68 +1,192 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Python Calculator</title>
+
     <style>
+        :root {
+            color-scheme: light;
+            --bg: #f1f5f9;
+            --card: #ffffff;
+            --text: #1e293b;
+            --input-bg: #ffffff;
+            --border: #cbd5e1;
+            --button: #2563eb;
+            --button-hover: #1d4ed8;
+            --shadow: #0000001a;
+        }
+
+        body.dark-theme {
+            color-scheme: dark;
+            --bg: #000000;
+            --card: #171717;
+            --text: #f5f5f5;
+            --input-bg: #262626;
+            --border: #404040;
+            --button: #3b82f6;
+            --button-hover: #2563eb;
+            --shadow: #00000066;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: Arial, sans-serif;
-            background: #f1f5f9;
+            background: var(--bg);
+            color: var(--text);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
+            padding: 20px;
+            transition: background 0.2s, color 0.2s;
         }
+
         .calculator {
-            background: white;
+            background: var(--card);
+            color: var(--text);
             padding: 28px;
             border-radius: 14px;
-            box-shadow: 0 8px 25px #0001;
-            width: 300px;
+            box-shadow: 0 8px 25px var(--shadow);
+            width: 100%;
+            max-width: 340px;
         }
-        h2 { text-align: center; color: #1e293b; }
-        input, select, button {
-            box-sizing: border-box;
+
+        h2 {
+            text-align: center;
+            color: var(--text);
+            margin-top: 8px;
+        }
+
+        .theme-toggle {
+            display: block;
+            width: auto;
+            margin: 0 0 20px auto;
+            padding: 9px 12px;
+            background: var(--input-bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        input, select, form button {
             width: 100%;
             padding: 12px;
             margin-top: 12px;
-            border: 1px solid #cbd5e1;
+            border: 1px solid var(--border);
             border-radius: 7px;
+            font-size: 15px;
         }
-        button {
-            background: #2563eb;
+
+        input, select {
+            background: var(--input-bg);
+            color: var(--text);
+        }
+
+        form button {
+            background: var(--button);
             color: white;
             border: none;
             cursor: pointer;
+            transition: background 0.2s;
         }
-        .result { color: #15803d; text-align: center; }
-        .error { color: #dc2626; text-align: center; }
+
+        form button:hover {
+            background: var(--button-hover);
+        }
+
+        .result {
+            color: #15803d;
+            text-align: center;
+            overflow-wrap: anywhere;
+        }
+
+        body.dark-theme .result {
+            color: #4ade80;
+        }
+
+        .error {
+            color: #dc2626;
+            text-align: center;
+            overflow-wrap: anywhere;
+        }
+
+        body.dark-theme .error {
+            color: #f87171;
+        }
     </style>
 </head>
+
 <body>
     <div class="calculator">
+        <button
+            type="button"
+            class="theme-toggle"
+            id="theme-toggle"
+            aria-pressed="false">
+            🌙 Dark Mode
+        </button>
+
         <h2>Python Calculator</h2>
+
         <form method="POST">
             <input type="number" step="any" name="a"
                    placeholder="First number" required>
+
             <select name="operation">
                 <option value="add">Addition (+)</option>
                 <option value="subtract">Subtraction (-)</option>
                 <option value="multiply">Multiplication (×)</option>
                 <option value="divide">Division (÷)</option>
             </select>
+
             <input type="number" step="any" name="b"
                    placeholder="Second number" required>
+
             <button type="submit">Calculate</button>
         </form>
 
         {% if result is not none %}
             <h3 class="result">Result: {{ result }}</h3>
         {% endif %}
+
         {% if error %}
             <h3 class="error">{{ error }}</h3>
         {% endif %}
     </div>
+
+    <script>
+        const toggle = document.getElementById("theme-toggle");
+
+        function applyTheme(theme) {
+            const isDark = theme === "dark";
+
+            document.body.classList.toggle("dark-theme", isDark);
+            toggle.textContent = isDark
+                ? "☀️ Light Mode"
+                : "🌙 Dark Mode";
+
+            toggle.setAttribute("aria-pressed", String(isDark));
+        }
+
+        // Restore the user's preference when the page loads.
+        const savedTheme = localStorage.getItem("calculator-theme");
+        applyTheme(savedTheme === "dark" ? "dark" : "light");
+
+        toggle.addEventListener("click", () => {
+            const isDark = !document.body.classList.contains("dark-theme");
+            const newTheme = isDark ? "dark" : "light";
+
+            applyTheme(newTheme);
+            localStorage.setItem("calculator-theme", newTheme);
+        });
+    </script>
 </body>
 </html>
