@@ -1,0 +1,15 @@
+Total HTTP requests
+
+sum(rate(flask_http_request_total[5m])) by (path, method)
+
+Calculator operations
+
+sum(rate(calculator_operation_total[5m])) by (operation, status)
+
+Error count
+
+sum(rate(calculator_operation_total{status="error"}[5m])) by (operation)
+
+Requests per second
+
+sum(rate(flask_http_request_total[5m]))
