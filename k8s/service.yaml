@@ -4,6 +4,9 @@ kind: Service
 metadata:
   name: python-calculator
   namespace: calci
+  labels:
+    app: python-calculator
+
 spec:
   type: LoadBalancer
   allocateLoadBalancerNodePorts: false
