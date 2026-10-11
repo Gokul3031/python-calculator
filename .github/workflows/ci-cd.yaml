@@ -57,15 +57,3 @@ jobs:
             git commit -m "chore: deploy image ${IMAGE_TAG}"
             git push
           fi
-
-      - name: Keep only the latest 2 GHCR versions
-        uses: actions/delete-package-versions@v5
-        with:
-          package-name: python-calculator
-          package-type: container
-          owner: Gokul3031
-          token: ${{ secrets.GHCR_DELETE_TOKEN }}
-          min-versions-to-keep: 2
-          num-old-versions-to-delete: 1
-
-       
