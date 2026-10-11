@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: python-calculator
-          image: ghcr.io/gokul3031/python-calculator:latest
+          image: ghcr.io/gokul3031/python-calculator:8b0ba696571edd5e0e53b2fa15efe1d610caf047
           ports:
             - containerPort: 5000
           imagePullPolicy: Always
