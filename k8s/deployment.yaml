@@ -16,9 +16,9 @@ spec:
       containers:
         - name: python-calculator
           image: ghcr.io/gokul3031/python-calculator:5e876c0d0edc4aa0891b115b9b5d38b1b766f3c1
+          imagePullPolicy: Always
           ports:
             - containerPort: 5000
-          imagePullPolicy: Always
           resources:
             requests:
               cpu: "100m"
@@ -26,15 +26,15 @@ spec:
             limits:
               cpu: "250m"
               memory: "256Mi"
-      livenessProbe:
-        httpGet:
-          path: /healthz
-          port: 5000
-        initialDelaySeconds: 15
-        periodSeconds: 10
-      readinessProbe:
-        httpGet:
-          path: /healthz
-          port: 5000
-        initialDelaySeconds: 
-        periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 5000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 5
