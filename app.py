@@ -1,3 +1,5 @@
+
+import math
 import time
 
 from flask import Flask, render_template, request
@@ -26,48 +28,121 @@ calculator_requests_total = Counter(
     ["method", "status"],
 )
 
+SUPPORTED_OPERATIONS = {
+    "add",
+    "subtract",
+    "multiply",
+    "divide",
+}
+
+
+class CalculatorError(ValueError):
+    """An expected calculator input or calculation error."""
+
+
+def parse_number(value, field_name):
+    """Convert an input string to a finite floating-point number."""
+    if value is None or not value.strip():
+        raise CalculatorError(f"Please enter the {field_name}.")
+
+    try:
+        number = float(value)
+    except (ValueError, OverflowError):
+        raise CalculatorError(
+            f"The {field_name} must be a valid number."
+        ) from None
+
+    if not math.isfinite(number):
+        raise CalculatorError(
+            f"The {field_name} must be a finite number."
+        )
+
+    return number
+
+
+def calculate(a, b, operation):
+    """Perform one supported calculation."""
+    if operation not in SUPPORTED_OPERATIONS:
+        raise CalculatorError("Unsupported operation.")
+
+    if operation == "add":
+        result = a + b
+    elif operation == "subtract":
+        result = a - b
+    elif operation == "multiply":
+        result = a * b
+    else:
+        if b == 0:
+            raise CalculatorError("Cannot divide by zero.")
+        result = a / b
+
+    if not math.isfinite(result):
+        raise CalculatorError(
+            "The result is too large to represent."
+        )
+
+    return result
+
+
 @app.route("/", methods=["GET", "POST"])
 def calculator():
     result = None
     error = None
-    request_start = time.perf_counter()
     operation = "unknown"
+    request_start = time.perf_counter()
 
     if request.method == "POST":
+        operation = request.form.get("operation", "unknown")
+
+        # Use only fixed metric labels to avoid unbounded label values.
+        metric_operation = (
+            operation
+            if operation in SUPPORTED_OPERATIONS
+            else "unknown"
+        )
+
+        operation_start = time.perf_counter()
+
         try:
-            a = float(request.form["a"])
-            b = float(request.form["b"])
-            operation = request.form["operation"]
+            a = parse_number(request.form.get("a"), "first number")
+            b = parse_number(request.form.get("b"), "second number")
 
-            if operation == "add":
-                result = a + b
-                calculator_operation_total.labels(operation=operation, status="success").inc()
-            elif operation == "subtract":
-                result = a - b
-                calculator_operation_total.labels(operation=operation, status="success").inc()
-            elif operation == "multiply":
-                result = a * b
-                calculator_operation_total.labels(operation=operation, status="success").inc()
-            elif operation == "divide":
-                if b == 0:
-                    error = "Cannot divide by zero"
-                    calculator_operation_total.labels(operation=operation, status="error").inc()
-                else:
-                    result = a / b
-                    calculator_operation_total.labels(operation=operation, status="success").inc()
-            else:
-                error = "Unsupported operation"
-                calculator_operation_total.labels(operation=operation, status="error").inc()
-        except (ValueError, KeyError):
-            error = "Please enter valid numbers"
-            calculator_operation_total.labels(operation="invalid_input", status="error").inc()
+            result = calculate(a, b, operation)
 
-    status = "success" if error is None else "error"
-    processing_time = time.perf_counter() - request_start
-    calculator_operation_duration_seconds.labels(operation=operation).observe(processing_time)
-    calculator_requests_total.labels(method=request.method, status=status).inc()
+        except CalculatorError as exc:
+            error = str(exc)
 
-    return render_template("index.html", result=result, error=error)
+        except (OverflowError, ZeroDivisionError):
+            error = "The calculation could not be completed."
+
+        finally:
+            calculator_operation_duration_seconds.labels(
+                operation=metric_operation
+            ).observe(time.perf_counter() - operation_start)
+
+        status = "error" if error else "success"
+
+        calculator_operation_total.labels(
+            operation=metric_operation,
+            status=status,
+        ).inc()
+
+    status = "error" if error else "success"
+
+    calculator_requests_total.labels(
+        method=request.method,
+        status=status,
+    ).inc()
+
+    # Keep the route timing available for future diagnostics.
+    _request_duration = time.perf_counter() - request_start
+
+    return render_template(
+        "index.html",
+        result=result,
+        error=error,
+    )
+
 
 @app.route("/healthz", methods=["GET"])
 def health_check():
@@ -75,3 +150,5 @@ def health_check():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
+
+print("hello world")
